@@ -1,0 +1,89 @@
+-- ========================
+-- USERS TABLE
+-- ========================
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    weight DECIMAL(5,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ========================
+-- FRIENDS (Self-referencing Many-to-Many)
+-- ========================
+CREATE TABLE friends (
+    user_id INT NOT NULL,
+    friend_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- ========================
+-- WORKOUTS TABLE
+-- ========================
+CREATE TABLE workouts (
+    workout_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    workout_date DATE NOT NULL,
+    duration_minutes INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- ========================
+-- EXERCISES TABLE
+-- ========================
+CREATE TABLE exercises (
+    exercise_id SERIAL PRIMARY KEY,
+    workout_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    sets INT,
+    reps INT,
+    weight DECIMAL(6,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (workout_id) REFERENCES workouts(workout_id) ON DELETE CASCADE
+);
+
+-- ========================
+-- GOALS TABLE
+-- ========================
+CREATE TABLE goals (
+    goal_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    target_value INT,
+    metric VARCHAR(50),
+    start_date DATE,
+    end_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- ========================
+-- LEADERBOARD TABLE
+-- ========================
+CREATE TABLE leaderboard (
+    leaderboard_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    metric VARCHAR(50) NOT NULL,
+    metric_value INT NOT NULL,
+    week_start DATE NOT NULL,
+    week_end DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- Insert Customers
+INSERT INTO customers (name, email, phone)
+VALUES 
+('Alice Johnson', 'alice.bank@example.com', '9876543210'),
+('Bob Smith', 'bob.bank@example.com', '9123456780');
+
+-- Insert Accounts
+INSERT INTO accounts (customer_id, account_type, balance)
+VALUES
+(1, 'savings', 1000.00),
+(2, 'savings', 500.00);
